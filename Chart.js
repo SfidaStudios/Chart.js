@@ -87,6 +87,9 @@
 			// Boolean - Whether to show labels on the scale
 			scaleShowLabels: true,
 
+			// Boolean - Whether to show labels on X axis
+			dataShowLabels: true,
+
 			// Interpolated JS string - can access value
 			scaleLabel: "<%=value%>",
 
@@ -1537,15 +1540,25 @@
 				firstRotated,
 				lastRotated;
 
-
-			this.xScalePaddingRight = lastWidth/2 + 3;
+			this.xScalePaddingRight = lastWidth/2 + 14;
 			this.xScalePaddingLeft = (firstWidth/2 > this.yLabelWidth + 10) ? firstWidth/2 : this.yLabelWidth + 10;
 
 			this.xLabelRotation = 0;
 			if (this.display){
+
+				// We take care of the label visibility here
+				if (!this.dataShowLabels)
+				{
+					this.xLabelWidth = 0;
+					this.xScalePaddingRight = this.padding + 14;
+					this.xScalePaddingLeft = this.yLabelWidth + 8;
+					return;
+				}
+				
 				var originalLabelWidth = longestText(this.ctx,this.font,this.xLabels),
 					cosRotation,
 					firstRotatedWidth;
+
 				this.xLabelWidth = originalLabelWidth;
 				//Allow 3 pixels x2 padding either side for label readability
 				var xGridWidth = Math.floor(this.calculateX(1) - this.calculateX(0)) - 6;
@@ -1562,7 +1575,6 @@
 						this.xScalePaddingLeft = firstRotated + this.fontSize / 2;
 					}
 					this.xScalePaddingRight = this.fontSize/2;
-
 
 					this.xLabelRotation++;
 					this.xLabelWidth = cosRotation * originalLabelWidth;
@@ -1707,14 +1719,17 @@
 					ctx.stroke();
 					ctx.closePath();
 
-					ctx.save();
-					ctx.translate(xPos,(isRotated) ? this.endPoint + 12 : this.endPoint + 8);
-					ctx.rotate(toRadians(this.xLabelRotation)*-1);
-					ctx.font = this.font;
-					ctx.textAlign = (isRotated) ? "right" : "center";
-					ctx.textBaseline = (isRotated) ? "middle" : "top";
-					ctx.fillText(label, 0, 0);
-					ctx.restore();
+					// We don't want labels here, skip
+					if( this.dataShowLabels ) { 
+						ctx.save();
+						ctx.translate(xPos,(isRotated) ? this.endPoint + 12 : this.endPoint + 8);
+						ctx.rotate(toRadians(this.xLabelRotation)*-1);
+						ctx.font = this.font;
+						ctx.textAlign = (isRotated) ? "right" : "center";
+						ctx.textBaseline = (isRotated) ? "middle" : "top";
+						ctx.fillText(label, 0, 0);
+						ctx.restore();
+					}
 				},this);
 
 			}
@@ -2711,6 +2726,7 @@
 				gridLineColor : (this.options.scaleShowGridLines) ? this.options.scaleGridLineColor : "rgba(0,0,0,0)",
 				padding: (this.options.showScale) ? 0 : this.options.pointDotRadius + this.options.pointDotStrokeWidth,
 				showLabels : this.options.scaleShowLabels,
+				dataShowLabels : this.options.dataShowLabels,
 				display : this.options.showScale
 			};
 
