@@ -1551,7 +1551,6 @@
 				{
 					this.xLabelWidth = 0;
 					this.xScalePaddingRight = this.padding + 14;
-					this.xScalePaddingLeft = this.yLabelWidth + 8;
 					return;
 				}
 				
